@@ -21,7 +21,7 @@ fun LongRange.intersect(other: LongRange): LongRange? {
     }
 }
 
-fun LongRange.difference(other: LongRange): List<LongRange> {
+fun LongRange.distance(other: LongRange): List<LongRange> {
     if (contains(other)) return emptyList()
     if (!overlaps(other)) return listOf(other)
 

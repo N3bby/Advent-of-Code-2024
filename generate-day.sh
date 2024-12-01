@@ -11,7 +11,7 @@ echo "package day${DAY}
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
-class Day${DAY}Test {
+class Day${DAY}KtTest {
 
     @Test
     fun \`part 1 - example input\`() {
