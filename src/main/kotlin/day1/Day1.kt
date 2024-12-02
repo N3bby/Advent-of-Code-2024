@@ -6,9 +6,8 @@ typealias LocationId = Int
 
 fun parseLocationIds(input: String): Pair<List<LocationId>, List<LocationId>> {
     return input.lines()
-        .map { Regex("""(\d+)\s+(\d+)""").find(it) }
-        .map { it?.groupValues ?: throw IllegalArgumentException("Could not match regex on all lines of the input") }
-        .map { it[1].toInt() to it[2].toInt() }
+        .map { it.split(Regex("""\s+""")) }
+        .map { it[0].toInt() to it[1].toInt() }
         .unzip()
 }
 
