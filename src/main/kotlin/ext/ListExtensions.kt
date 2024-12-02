@@ -19,3 +19,5 @@ fun <T: Comparable<T>> List<T>.getAllUniqueCombinations(): Set<Pair<T, T>> {
         .map { it.sort() }
         .toSet()
 }
+
+fun <T> List<T>.dropAt(index: Int): List<T> = toMutableList().also { it.removeAt(index) }
