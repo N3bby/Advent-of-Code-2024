@@ -9,7 +9,7 @@ sealed class Instruction {
         override fun toString(): String = "don't()"
     }
 
-    data class Multiplication(private val a: Int, private val b: Int): Instruction() {
+    data class Multiplication(private val a: Int, private val b: Int) : Instruction() {
         override fun toString(): String = "mul($a,$b)"
 
         fun execute(): Int {
@@ -49,10 +49,12 @@ fun List<Instruction.Multiplication>.execute(): Int = sumOf { it.execute() }
 fun List<Instruction>.collapseConditionals(): List<Instruction.Multiplication> {
     var enabled = true
     val activeInstructions = mutableListOf<Instruction.Multiplication>()
-    forEach { instruction -> when (instruction) {
-        is Instruction.Do -> enabled = true
-        is Instruction.Dont -> enabled = false
-        is Instruction.Multiplication -> if (enabled) activeInstructions.add(instruction)
-    } }
+    forEach { instruction ->
+        when (instruction) {
+            is Instruction.Do -> enabled = true
+            is Instruction.Dont -> enabled = false
+            is Instruction.Multiplication -> if (enabled) activeInstructions.add(instruction)
+        }
+    }
     return activeInstructions
 }
