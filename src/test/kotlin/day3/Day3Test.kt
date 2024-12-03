@@ -30,7 +30,7 @@ class Day3KtTest {
 
         val instructions = findValidMultiplicationInstructions(input)
 
-        assertThat(instructions.sum()).isEqualTo(0)
+        assertThat(instructions.sum()).isEqualTo(191183308)
     }
 
     @Test
@@ -59,7 +59,7 @@ class Day3KtTest {
 
         val instructions = findValidInstructions(input)
 
-        assertThat(instructions.collapseConditionals().sum()).isEqualTo(0)
+        assertThat(instructions.collapseConditionals().sum()).isEqualTo(92082041)
     }
 }
 

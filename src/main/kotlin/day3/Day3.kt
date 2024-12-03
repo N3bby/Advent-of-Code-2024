@@ -9,7 +9,7 @@ sealed class Instruction {
         override fun toString(): String = instruction
 
         private val operands by lazy {
-            Regex("""mul\((\d{1,3}),(\d{1,3})\)""")
+            Regex("""mul\((\d+),(\d+)\)""")
                 .find(instruction)!!.groupValues
                 .let { Pair(it[1].toInt(), it[2].toInt()) }
         }
