@@ -41,7 +41,7 @@ fun findValidInstructions(memory: String): List<Instruction> {
     return matches.map { Instruction.buildInstruction(it.value) }
 }
 
-fun List<Instruction.Multiplication>.sum(): Int = sumOf { it.execute() }
+fun List<Instruction.Multiplication>.execute(): Int = sumOf { it.execute() }
 
 fun List<Instruction>.collapseConditionals(): List<Instruction.Multiplication> {
     var enabled = true

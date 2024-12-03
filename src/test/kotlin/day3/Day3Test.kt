@@ -21,7 +21,7 @@ class Day3KtTest {
             Instruction.Multiplication("mul(8,5)")
         )
 
-        assertThat(instructions.sum()).isEqualTo(161)
+        assertThat(instructions.execute()).isEqualTo(161)
     }
 
     @Test
@@ -30,7 +30,7 @@ class Day3KtTest {
 
         val instructions = findValidMultiplicationInstructions(input)
 
-        assertThat(instructions.sum()).isEqualTo(191183308)
+        assertThat(instructions.execute()).isEqualTo(191183308)
     }
 
     @Test
@@ -50,7 +50,7 @@ class Day3KtTest {
             Instruction.Multiplication("mul(8,5)")
         )
 
-        assertThat(instructions.collapseConditionals().sum()).isEqualTo(48)
+        assertThat(instructions.collapseConditionals().execute()).isEqualTo(48)
     }
 
     @Test
@@ -59,7 +59,7 @@ class Day3KtTest {
 
         val instructions = findValidInstructions(input)
 
-        assertThat(instructions.collapseConditionals().sum()).isEqualTo(92082041)
+        assertThat(instructions.collapseConditionals().execute()).isEqualTo(92082041)
     }
 }
 
