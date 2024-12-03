@@ -15,10 +15,10 @@ class Day3KtTest {
         val instructions = findValidMultiplicationInstructions(input)
 
         assertThat(instructions).containsExactly(
-            Instruction.Multiplication("mul(2,4)"),
-            Instruction.Multiplication("mul(5,5)"),
-            Instruction.Multiplication("mul(11,8)"),
-            Instruction.Multiplication("mul(8,5)")
+            Instruction.Multiplication(2, 4),
+            Instruction.Multiplication(5, 5),
+            Instruction.Multiplication(11, 8),
+            Instruction.Multiplication(8, 5)
         )
 
         assertThat(instructions.execute()).isEqualTo(161)
@@ -42,12 +42,12 @@ class Day3KtTest {
         val instructions = findValidInstructions(input)
 
         assertThat(instructions).containsExactly(
-            Instruction.Multiplication("mul(2,4)"),
+            Instruction.Multiplication(2, 4),
             Instruction.Dont,
-            Instruction.Multiplication("mul(5,5)"),
-            Instruction.Multiplication("mul(11,8)"),
+            Instruction.Multiplication(5, 5),
+            Instruction.Multiplication(11, 8),
             Instruction.Do,
-            Instruction.Multiplication("mul(8,5)")
+            Instruction.Multiplication(8, 5)
         )
 
         assertThat(instructions.collapseConditionals().execute()).isEqualTo(48)

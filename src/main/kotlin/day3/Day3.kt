@@ -1,44 +1,47 @@
 package day3
 
 sealed class Instruction {
-    data object Do : Instruction()
+    data object Do : Instruction() {
+        override fun toString(): String = "do()"
+    }
 
-    data object Dont : Instruction()
+    data object Dont : Instruction() {
+        override fun toString(): String = "don't()"
+    }
 
-    data class Multiplication(private val instruction: String): Instruction() {
-        override fun toString(): String = instruction
-
-        private val operands by lazy {
-            Regex("""mul\((\d+),(\d+)\)""")
-                .find(instruction)!!.groupValues
-                .let { Pair(it[1].toInt(), it[2].toInt()) }
-        }
+    data class Multiplication(private val a: Int, private val b: Int): Instruction() {
+        override fun toString(): String = "mul($a,$b)"
 
         fun execute(): Int {
-            val (a, b) = operands
             return a * b
+        }
+
+        companion object {
+            fun fromMatchResult(instruction: MatchResult): Multiplication {
+                val (a, b) = instruction.destructured
+                return Multiplication(a.toInt(), b.toInt())
+            }
         }
     }
 
     companion object {
-        fun buildInstruction(instruction: String): Instruction = when {
-            instruction.startsWith("do(") -> Do
-            instruction.startsWith("don't(") -> Dont
-            instruction.startsWith("mul(") -> Multiplication(instruction)
+        fun fromMatchResult(instruction: MatchResult): Instruction = when {
+            instruction.value == "do()" -> Do
+            instruction.value == "don't()" -> Dont
+            instruction.value.startsWith("mul(") -> Multiplication.fromMatchResult(instruction)
             else -> throw IllegalArgumentException("Unsupported instruction: $instruction")
         }
     }
 }
 
-
 fun findValidMultiplicationInstructions(memory: String): List<Instruction.Multiplication> {
-    val matches = Regex("""mul\(\d{1,3},\d{1,3}\)""").findAll(memory).toList()
-    return matches.map { Instruction.Multiplication(it.value) }
+    val matches = Regex("""mul\((\d{1,3}),(\d{1,3})\)""").findAll(memory).toList()
+    return matches.map { Instruction.Multiplication.fromMatchResult(it) }
 }
 
 fun findValidInstructions(memory: String): List<Instruction> {
-    val matches = Regex("""don't\(\)|do\(\)|mul\(\d{1,3},\d{1,3}\)""").findAll(memory).toList()
-    return matches.map { Instruction.buildInstruction(it.value) }
+    val matches = Regex("""mul\((\d{1,3}),(\d{1,3})\)|do\(\)|don't\(\)""").findAll(memory).toList()
+    return matches.map { Instruction.fromMatchResult(it) }
 }
 
 fun List<Instruction.Multiplication>.execute(): Int = sumOf { it.execute() }
