@@ -29,6 +29,14 @@ fun findWordMatchesInGrid(grid: Grid<Char>, word: String): Int {
     }
 }
 
+fun findKernelMatchesInGrid(grid: Grid<Char>, kernels: List<Grid<Char>>): Int {
+    return grid.positions.count { position ->
+        kernels.any { kernel ->
+            grid.matchesKernelAtPosition(position, kernel)
+        }
+    }
+}
+
 val xmasKernels = listOf<Grid<Char>>(
     Grid.fromString("""
         M.S
@@ -51,11 +59,3 @@ val xmasKernels = listOf<Grid<Char>>(
         M.M
     """.trimIndent()),
 )
-
-fun findKernelMatchesInGrid(grid: Grid<Char>, kernels: List<Grid<Char>>): Int {
-    return grid.positions.count { position ->
-        kernels.any { kernel ->
-            grid.matchesKernelAtPosition(position, kernel)
-        }
-    }
-}
