@@ -13,18 +13,28 @@ data class Grid<T>(val rows: List<List<T>>) {
             return (0..<width).map { column -> rows.map { it[column] } }
         }
 
+    val positions = sequence {
+        for (x in 0..<width) {
+            for (y in 0..<height) {
+                yield(Position(x, y))
+            }
+        }
+    }
+
+    fun isInBounds(position: Position): Boolean {
+        return position.x in 0 until width &&
+                position.y in 0 until height
+    }
+
     fun getAtPosition(position: Position): T {
         return rows[position.y][position.x]
     }
 
-    fun getPositionsWhere(predicate: (cell: T) -> Boolean): List<Position> {
+    fun getPositionsWhere(predicate: (position: Position) -> Boolean): List<Position> {
         val matchingCells = mutableListOf<Position>()
 
-        for (x in 0..<width) {
-            for (y in 0..<height) {
-                val position = Position(x, y)
-                if (predicate(getAtPosition(position))) matchingCells.add(position)
-            }
+        positions.forEach { position ->
+            if (predicate(position)) matchingCells.add(position)
         }
 
         return matchingCells
@@ -43,4 +53,23 @@ data class Grid<T>(val rows: List<List<T>>) {
             }
         )
     }
+
+    companion object {
+        fun fromString(input: String): Grid<Char> {
+            val rows = input.lines().map { it.toList() }
+            return Grid(rows)
+        }
+    }
 }
+
+fun Grid<Char>.matchesKernelAtPosition(position: Position, kernel: Grid<Char>, wildcard: Char = '.'): Boolean {
+    return kernel.positions.all { kernelPosition ->
+        if(kernel.getAtPosition(kernelPosition) == wildcard) {
+            true
+        } else {
+            val positionToCheck = position + kernelPosition.toOffset()
+            isInBounds(positionToCheck) && getAtPosition(positionToCheck) == kernel.getAtPosition(kernelPosition)
+        }
+    }
+}
+

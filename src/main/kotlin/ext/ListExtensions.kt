@@ -21,3 +21,7 @@ fun <T: Comparable<T>> List<T>.getAllUniqueCombinations(): Set<Pair<T, T>> {
 }
 
 fun <T> List<T>.dropAt(index: Int): List<T> = toMutableList().also { it.removeAt(index) }
+
+fun <T> List<T>.allIndexed(predicate: (index: Int, value: T) -> Boolean): Boolean {
+    return filterIndexed { index, value -> predicate(index, value) }.size == size
+}
