@@ -1,5 +1,6 @@
 package day5
 
+import ext.sort
 import kotlin.math.ceil
 
 typealias PageNumber = Int
@@ -7,7 +8,16 @@ typealias PageNumber = Int
 data class PageOrderingRule(
     val before: PageNumber,
     val after: PageNumber,
-)
+) {
+    fun concernsPages(page1: PageNumber, page2: PageNumber): Boolean =
+        (before to after).sort() == (page1 to page2).sort()
+
+    fun areInCorrectOrder(page1: PageNumber, page2: PageNumber): Boolean =
+        (before to after) == (page1 to page2)
+
+    fun areInReverseOrder(page1: PageNumber, page2: PageNumber): Boolean =
+        (before to after) == (page2 to page1)
+}
 
 data class Update(val pages: List<PageNumber>) {
 
@@ -33,22 +43,15 @@ data class Update(val pages: List<PageNumber>) {
 }
 
 class PageOrderingRuleComparator(private val rules: List<PageOrderingRule>) : Comparator<PageNumber> {
-    override fun compare(o1: PageNumber?, o2: PageNumber?): Int {
-        if (o1 == null || o2 == null) {
-            return 0
-        }
+    override fun compare(page1: PageNumber?, page2: PageNumber?): Int {
+        if (page1 == null || page2 == null) return 0
 
-        val applicableRule = rules.find { rule ->
-            rule.before == o1 && rule.after == o2 || rule.before == o2 && rule.after == o1
-        }
-        if (applicableRule == null) {
-            return 0
-        }
+        val rule = rules.find { it.concernsPages(page1, page2) } ?: return 0
 
-        return if (o1 == applicableRule.before && o2 == applicableRule.after) {
-            -1
-        } else if (o1 == applicableRule.after && o2 == applicableRule.before) {
+        return if (rule.areInCorrectOrder(page1, page2)) {
             1
+        } else if (rule.areInReverseOrder(page1, page2)) {
+            -1
         } else {
             0
         }
