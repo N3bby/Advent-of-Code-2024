@@ -60,7 +60,6 @@ class Day6KtTest {
     }
 
     @Test
-    @Disabled("Takes 15s to run on my M1 Macbook Pro")
     fun `part 2 - puzzle input`() {
         val input = readInput(6)
 

@@ -7,9 +7,9 @@ import util.Position
 data class Bounds(val width: Int, val height: Int)
 
 data class Guard(
-    val position: Position,
-    val direction: Direction,
-    val visitedPositions: List<Pair<Position, Direction>>
+    var position: Position,
+    var direction: Direction,
+    val visitedPositionsSet: MutableSet<Pair<Position, Direction>>
 ) {
     private val nextPosition: Position get() = position + direction.offset
 
@@ -19,10 +19,18 @@ data class Guard(
         if (map.isObstructed(nextPosition)) {
             throw IllegalStateException("Cannot move forward, obstruction at $nextPosition")
         }
-        return Guard(nextPosition, direction, visitedPositions + (position to direction))
+        val positionToAdd = position to direction
+        this.visitedPositionsSet.add(positionToAdd)
+
+        this.position = nextPosition
+
+        return this
     }
 
-    private fun turnRight(): Guard = Guard(position, direction.turnRight(), visitedPositions)
+    private fun turnRight(): Guard {
+        this.direction = this.direction.turnRight()
+        return this
+    }
 
     fun move(map: Map): Guard {
         return if (this.canMoveForward(map)) {
@@ -32,10 +40,11 @@ data class Guard(
         }
     }
 
+    fun makeCopy() = Guard(position, direction, visitedPositionsSet.toMutableSet())
 }
 
 data class Map(
-    private val obstructions: List<Position>,
+    private val obstructions: Set<Position>,
     val bounds: Bounds
 ) {
     fun isInBounds(position: Position): Boolean {
@@ -82,7 +91,7 @@ fun Guard.isRunningInLoop(map: Map): Boolean {
     var guard = this;
 
     val isInLoop: () -> Boolean = {
-        guard.visitedPositions.contains(guard.position to guard.direction)
+        guard.visitedPositionsSet.contains(guard.position to guard.direction)
     }
 
     while (!isInLoop()) {
@@ -96,11 +105,11 @@ fun Guard.isRunningInLoop(map: Map): Boolean {
 }
 
 fun findDistinctVisitedPositions(map: Map, guard: Guard): Int {
-    return guard.moveUntilOutOfBounds(map).visitedPositions.map { it.first }.toSet().size
+    return guard.moveUntilOutOfBounds(map).visitedPositionsSet.map { it.first }.toSet().size
 }
 
 fun findManualObstructionsThatCauseLoop(map: Map, guard: Guard): Int {
-    val positionsToCheck = guard.moveUntilOutOfBounds(map).visitedPositions.map { it.first }.toSet()
+    val positionsToCheck = guard.makeCopy().moveUntilOutOfBounds(map).visitedPositionsSet.map { it.first }.toSet()
     var positionsChecked = 0
 
     return positionsToCheck.parallelStream()
@@ -111,14 +120,14 @@ fun findManualObstructionsThatCauseLoop(map: Map, guard: Guard): Int {
         .filter { position ->
             when {
                 map.isObstructed(position) || position == guard.position -> false
-                else -> guard.isRunningInLoop(map.withObstruction(position))
+                else -> guard.makeCopy().isRunningInLoop(map.withObstruction(position))
             }
         }.count().toInt()
 }
 
 
 fun parseMap(input: String): Pair<Map, Guard> {
-    val obstructions = mutableListOf<Position>()
+    val obstructions = mutableSetOf<Position>()
     var guardPosition: Position? = null
     var guardDirection: Direction? = null
 
@@ -149,7 +158,7 @@ fun parseMap(input: String): Pair<Map, Guard> {
     }
 
     val map = Map(obstructions, Bounds(grid.width, grid.height))
-    val guard = Guard(guardPosition!!, guardDirection!!, emptyList())
+    val guard = Guard(guardPosition!!, guardDirection!!, mutableSetOf())
 
     return map to guard
 }
