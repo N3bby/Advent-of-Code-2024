@@ -9,7 +9,7 @@ data class Bounds(val width: Int, val height: Int)
 data class Guard(
     var position: Position,
     var direction: Direction,
-    val visitedPositionsSet: MutableSet<Pair<Position, Direction>>
+    val visitedPositionsSet: HashSet<Pair<Position, Direction>>
 ) {
     private val nextPosition: Position get() = position + direction.offset
 
@@ -34,7 +34,12 @@ data class Guard(
         }
     }
 
-    fun makeCopy() = Guard(position, direction, visitedPositionsSet.toMutableSet())
+    fun makeCopy() = Guard(
+        position,
+        direction,
+        HashSet<Pair<Position, Direction>>(10_000)
+            .also { it.addAll(visitedPositionsSet) }
+    )
 }
 
 data class Map(
@@ -149,7 +154,7 @@ fun parseMap(input: String): Pair<Map, Guard> {
     }
 
     val map = Map(obstructions, Bounds(grid.width, grid.height))
-    val guard = Guard(guardPosition!!, guardDirection!!, mutableSetOf())
+    val guard = Guard(guardPosition!!, guardDirection!!, HashSet(10_000))
 
     return map to guard
 }
