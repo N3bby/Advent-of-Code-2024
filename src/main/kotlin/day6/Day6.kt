@@ -105,12 +105,12 @@ fun Guard.runsInLoop(map: Map): Boolean {
 }
 
 fun findManualObstructionsThatCauseLoop(map: Map, guard: Guard): Int {
-    val positions = map.bounds.positions
+    val positionsToCheck = guard.moveUntilOutOfBounds(map).visitedPositions.map { it.first }.toSet()
     var positionsChecked = 0
 
-    return positions.asStream().parallel().filter { position ->
+    return positionsToCheck.parallelStream().filter { position ->
         positionsChecked++
-        if(positionsChecked % 1000 == 0) println("${positionsChecked}/${positions.count()}")
+        if(positionsChecked % 1000 == 0) println("${positionsChecked}/${positionsToCheck.count()}")
 
         if (map.isObstructed(position) || guard.position == position) {
             false
