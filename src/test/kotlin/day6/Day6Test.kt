@@ -23,9 +23,9 @@ class Day6KtTest {
         """.trimIndent()
 
         val (map, guard) = parseMap(input)
-        val movedGuard = guard.moveUntilOutOfBounds(map)
+        val distinctPositions = findDistinctVisitedPositions(map, guard)
 
-        assertThat(movedGuard.visitedPositions.map { it.first }.toSet().size).isEqualTo(41)
+        assertThat(distinctPositions).isEqualTo(41)
     }
 
     @Test
@@ -33,9 +33,9 @@ class Day6KtTest {
         val input = readInput(6)
 
         val (map, guard) = parseMap(input)
-        val movedGuard = guard.moveUntilOutOfBounds(map)
+        val distinctPositions = findDistinctVisitedPositions(map, guard)
 
-        assertThat(movedGuard.visitedPositions.map { it.first }.toSet().size).isEqualTo(4374)
+        assertThat(distinctPositions).isEqualTo(4374)
     }
 
     @Test

@@ -11,18 +11,27 @@ data class Guard(
     val direction: Direction,
     val visitedPositions: List<Pair<Position, Direction>>
 ) {
-    val nextPosition: Position get() = position + direction.offset
+    private val nextPosition: Position get() = position + direction.offset
 
-    fun canMoveForward(map: Map): Boolean = !map.isObstructed(nextPosition)
+    private fun canMoveForward(map: Map): Boolean = !map.isObstructed(nextPosition)
 
-    fun moveForward(map: Map): Guard {
+    private fun moveForward(map: Map): Guard {
         if (map.isObstructed(nextPosition)) {
             throw IllegalStateException("Cannot move forward, obstruction at $nextPosition")
         }
         return Guard(nextPosition, direction, visitedPositions + (position to direction))
     }
 
-    fun turnRight(): Guard = Guard(position, direction.turnRight(), visitedPositions)
+    private fun turnRight(): Guard = Guard(position, direction.turnRight(), visitedPositions)
+
+    fun move(map: Map): Guard {
+        return if (this.canMoveForward(map)) {
+            this.moveForward(map)
+        } else {
+            this.turnRight()
+        }
+    }
+
 }
 
 data class Map(
@@ -37,11 +46,11 @@ data class Map(
         return obstructions.contains(position)
     }
 
-    fun addObstruction(position: Position): Map {
+    fun withObstruction(position: Position): Map {
         return Map(obstructions + position, bounds)
     }
 
-    fun toString(guard: Guard, manualObstruction: List<Position> = emptyList()): String {
+    fun toString(guard: Guard, manualObstructions: List<Position> = emptyList()): String {
         val stringBuilder = StringBuilder()
 
         for (y in bounds.height - 1 downTo 0) {
@@ -49,7 +58,7 @@ data class Map(
                 val position = Position(x, y)
                 when {
                     position == guard.position -> stringBuilder.append(guard.direction.toChar())
-                    manualObstruction.contains(position) -> stringBuilder.append('O')
+                    manualObstructions.contains(position) -> stringBuilder.append('O')
                     obstructions.contains(position) -> stringBuilder.append('#')
                     else -> stringBuilder.append('.')
                 }
@@ -61,24 +70,15 @@ data class Map(
     }
 }
 
-fun Guard.move(map: Map): Guard {
-    return if (this.canMoveForward(map)) {
-        this.moveForward(map)
-    } else {
-        this.turnRight()
-    }
-}
-
 fun Guard.moveUntilOutOfBounds(map: Map): Guard {
     var guard = this
     while (map.isInBounds(guard.position)) {
         guard = guard.move(map)
-        // println(map.toString(guard))
     }
     return guard
 }
 
-fun Guard.runsInLoop(map: Map): Boolean {
+fun Guard.isRunningInLoop(map: Map): Boolean {
     var guard = this;
 
     val isInLoop: () -> Boolean = {
@@ -95,21 +95,25 @@ fun Guard.runsInLoop(map: Map): Boolean {
     return true
 }
 
+fun findDistinctVisitedPositions(map: Map, guard: Guard): Int {
+    return guard.moveUntilOutOfBounds(map).visitedPositions.map { it.first }.toSet().size
+}
+
 fun findManualObstructionsThatCauseLoop(map: Map, guard: Guard): Int {
     val positionsToCheck = guard.moveUntilOutOfBounds(map).visitedPositions.map { it.first }.toSet()
     var positionsChecked = 0
 
-    return positionsToCheck.parallelStream().filter { position ->
-        positionsChecked++
-        if (positionsChecked % 1000 == 0) println("${positionsChecked}/${positionsToCheck.count()}")
-
-        if (map.isObstructed(position) || guard.position == position) {
-            false
-        } else {
-            val manuallyObstructedMap = map.addObstruction(position)
-            guard.runsInLoop(manuallyObstructedMap)
+    return positionsToCheck.parallelStream()
+        .peek {
+            positionsChecked++
+            if (positionsChecked % 1000 == 0) println("${positionsChecked}/${positionsToCheck.count()}")
         }
-    }.count().toInt()
+        .filter { position ->
+            when {
+                map.isObstructed(position) || position == guard.position -> false
+                else -> guard.isRunningInLoop(map.withObstruction(position))
+            }
+        }.count().toInt()
 }
 
 
