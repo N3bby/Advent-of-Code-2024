@@ -1,5 +1,6 @@
 package util
 
+import java.lang.IllegalArgumentException
 import kotlin.math.*
 
 data class Position(val x: Int, val y: Int) : Comparable<Position> {
@@ -7,8 +8,8 @@ data class Position(val x: Int, val y: Int) : Comparable<Position> {
         return Position(x + offset.x, y + offset.y)
     }
 
-    operator fun minus(position: Position): Offset {
-        return Offset(x - position.x, y - position.y)
+    operator fun minus(offset: Offset): Position {
+        return Position(x - offset.x, y - offset.y)
     }
 
     val neighbours: List<Position>
@@ -62,5 +63,23 @@ enum class Direction(val offset: Offset) {
     LEFT(Offset(-1, 0)),
     LEFT_DOWN(Offset(-1, -1)),
     DOWN(Offset(0, -1)),
-    RIGHT_DOWN(Offset(1, -1))
+    RIGHT_DOWN(Offset(1, -1));
+
+    fun turnRight(): Direction = when (this) {
+        RIGHT -> DOWN
+        DOWN -> LEFT
+        LEFT -> UP
+        UP -> RIGHT
+        else -> throw IllegalArgumentException("Cannot rotate right from $this")
+    }
+
+    fun toChar(): Char {
+        return when (this) {
+            RIGHT -> '>'
+            UP -> '^'
+            LEFT -> '<'
+            DOWN -> 'v'
+            else -> throw IllegalArgumentException("No char for $this")
+        }
+    }
 }
