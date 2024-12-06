@@ -15,7 +15,7 @@ data class Guard(
 
     private fun canMoveForward(map: Map): Boolean = !map.isObstructed(nextPosition)
 
-    private fun moveForward(map: Map): Guard {
+    private fun moveForward(map: Map) {
         if (map.isObstructed(nextPosition)) {
             throw IllegalStateException("Cannot move forward, obstruction at $nextPosition")
         }
@@ -23,17 +23,14 @@ data class Guard(
         this.visitedPositionsSet.add(positionToAdd)
 
         this.position = nextPosition
-
-        return this
     }
 
-    private fun turnRight(): Guard {
+    private fun turnRight() {
         this.direction = this.direction.turnRight()
-        return this
     }
 
-    fun move(map: Map): Guard {
-        return if (this.canMoveForward(map)) {
+    fun move(map: Map) {
+        if (this.canMoveForward(map)) {
             this.moveForward(map)
         } else {
             this.turnRight()
@@ -80,24 +77,21 @@ data class Map(
 }
 
 fun Guard.moveUntilOutOfBounds(map: Map): Guard {
-    var guard = this
-    while (map.isInBounds(guard.position)) {
-        guard = guard.move(map)
+    while (map.isInBounds(this.position)) {
+        this.move(map)
     }
-    return guard
+    return this
 }
 
 fun Guard.isRunningInLoop(map: Map): Boolean {
-    var guard = this;
-
     val isInLoop: () -> Boolean = {
-        guard.visitedPositionsSet.contains(guard.position to guard.direction)
+        this.visitedPositionsSet.contains(this.position to this.direction)
     }
 
     while (!isInLoop()) {
-        guard = guard.move(map)
+        this.move(map)
 
-        if (!map.isInBounds(guard.position)) {
+        if (!map.isInBounds(this.position)) {
             return false
         }
     }
