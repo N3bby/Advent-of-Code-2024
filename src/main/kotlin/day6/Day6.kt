@@ -3,17 +3,8 @@ package day6
 import util.Direction
 import util.Grid
 import util.Position
-import kotlin.streams.asStream
 
-data class Bounds(val width: Int, val height: Int) {
-    val positions = sequence {
-        for (y in 0 until height) {
-            for (x in 0 until width) {
-                yield(Position(x, y))
-            }
-        }
-    }
-}
+data class Bounds(val width: Int, val height: Int)
 
 data class Guard(
     val position: Position,
@@ -110,7 +101,7 @@ fun findManualObstructionsThatCauseLoop(map: Map, guard: Guard): Int {
 
     return positionsToCheck.parallelStream().filter { position ->
         positionsChecked++
-        if(positionsChecked % 1000 == 0) println("${positionsChecked}/${positionsToCheck.count()}")
+        if (positionsChecked % 1000 == 0) println("${positionsChecked}/${positionsToCheck.count()}")
 
         if (map.isObstructed(position) || guard.position == position) {
             false
