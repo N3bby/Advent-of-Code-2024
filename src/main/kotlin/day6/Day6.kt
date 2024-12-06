@@ -15,10 +15,7 @@ data class Guard(
 
     private fun canMoveForward(map: Map): Boolean = !map.isObstructed(nextPosition)
 
-    private fun moveForward(map: Map) {
-        if (map.isObstructed(nextPosition)) {
-            throw IllegalStateException("Cannot move forward, obstruction at $nextPosition")
-        }
+    private fun moveForward() {
         val positionToAdd = position to direction
         this.visitedPositionsSet.add(positionToAdd)
 
@@ -31,7 +28,7 @@ data class Guard(
 
     fun move(map: Map) {
         if (this.canMoveForward(map)) {
-            this.moveForward(map)
+            this.moveForward()
         } else {
             this.turnRight()
         }
