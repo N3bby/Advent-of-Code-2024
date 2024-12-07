@@ -14,17 +14,17 @@ enum class Operator(
 
 data class Equation(val result: Long, val numbers: List<Long>) {
     fun isValid(operators: List<Operator>): Boolean {
-        return canProduce(operators, result, numbers)
+        return canProduceResult(operators, result, numbers)
     }
 
-    private fun canProduce(operators: List<Operator>, result: Long, numbers: List<Long>): Boolean {
+    private fun canProduceResult(operators: List<Operator>, result: Long, numbers: List<Long>): Boolean {
         if (numbers.size == 1) {
             return numbers.first() == result
         }
         return operators
             .filter { operator -> operator.canOperateInverse(result, numbers.last()) }
             .any { operator ->
-                canProduce(
+                canProduceResult(
                     operators = operators,
                     result = operator.operateInverse(result, numbers.last()),
                     numbers = numbers.dropLast(1)
