@@ -1,5 +1,12 @@
 package util
 
+data class Bounds(val width: Int, val height: Int) {
+    fun contains(position: Position): Boolean {
+        return position.x in 0 until width &&
+                position.y in 0 until height
+    }
+}
+
 /**
  * Grid with origin defined in the top left corner
  */
@@ -13,6 +20,8 @@ data class Grid<T>(val rows: List<List<T>>) {
             return (0..<width).map { column -> rows.map { it[column] } }
         }
 
+    val bounds get() = Bounds(width, height)
+
     val positions = sequence {
         for (x in 0..<width) {
             for (y in 0..<height) {
@@ -21,10 +30,7 @@ data class Grid<T>(val rows: List<List<T>>) {
         }
     }
 
-    fun isInBounds(position: Position): Boolean {
-        return position.x in 0 until width &&
-                position.y in 0 until height
-    }
+    fun isInBounds(position: Position): Boolean = bounds.contains(position)
 
     fun getAtPosition(position: Position): T {
         return rows[position.y][position.x]
@@ -64,7 +70,7 @@ data class Grid<T>(val rows: List<List<T>>) {
 
 fun Grid<Char>.matchesKernelAtPosition(position: Position, kernel: Grid<Char>, wildcard: Char = '.'): Boolean {
     return kernel.positions.all { kernelPosition ->
-        if(kernel.getAtPosition(kernelPosition) == wildcard) {
+        if (kernel.getAtPosition(kernelPosition) == wildcard) {
             true
         } else {
             val positionToCheck = position + kernelPosition.toOffset()

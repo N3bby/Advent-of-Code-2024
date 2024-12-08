@@ -1,10 +1,9 @@
 package day6
 
+import util.Bounds
 import util.Direction
 import util.Grid
 import util.Position
-
-data class Bounds(val width: Int, val height: Int)
 
 data class Guard(
     var position: Position,
