@@ -7,7 +7,7 @@ import util.cartesianProduct
 
 data class Antenna(val position: Position, val frequency: Char)
 
-fun Pair<Antenna, Antenna>.getAntinode(bounds: Bounds): List<Position> {
+fun Pair<Antenna, Antenna>.getAntinodes(bounds: Bounds): List<Position> {
     val (antenna1, antenna2) = this
 
     val deltaX = antenna1.position.x - antenna2.position.x
@@ -23,7 +23,7 @@ fun Pair<Antenna, Antenna>.getAntinode(bounds: Bounds): List<Position> {
     }
 }
 
-fun Pair<Antenna, Antenna>.getAntinodeWithResonantHarmonics(bounds: Bounds): List<Position> {
+fun Pair<Antenna, Antenna>.getAntinodesWithResonantHarmonics(bounds: Bounds): List<Position> {
     val (antenna1, antenna2) = this
 
     val deltaX = antenna1.position.x - antenna2.position.x
@@ -51,9 +51,9 @@ fun findAntinodes(bounds: Bounds, antennas: List<Antenna>, considerResonantHarmo
         .flatMap { it.getCombinations() }
         .flatMap { combination ->
             if(considerResonantHarmonics) {
-                combination.getAntinodeWithResonantHarmonics(bounds)
+                combination.getAntinodesWithResonantHarmonics(bounds)
             } else {
-                combination.getAntinode(bounds)
+                combination.getAntinodes(bounds)
             }
         }
         .toSet()
