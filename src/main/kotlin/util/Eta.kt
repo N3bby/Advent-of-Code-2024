@@ -15,7 +15,7 @@ class Eta(private val totalUnitsToProcess: Long, private val delayBetweenUpdates
         printEtaIfNeeded()
     }
 
-    // TODO Check if this is correct. It doesn't seem to product accurate estimates
+    // TODO Check if this is correct. It doesn't seem to produce accurate estimates
     private fun printEtaIfNeeded() {
         val now = System.currentTimeMillis()
         if (now - lastPrintTimestamp >= delayBetweenUpdatesInMs) {
