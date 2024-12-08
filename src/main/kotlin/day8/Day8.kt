@@ -4,7 +4,6 @@ import util.Bounds
 import util.Grid
 import util.Position
 import util.cartesianProduct
-import java.util.stream.Collectors.toSet
 
 data class Antenna(val position: Position, val frequency: Char)
 
@@ -49,16 +48,15 @@ fun findAntinodes(bounds: Bounds, antennas: List<Antenna>, considerResonantHarmo
         .map { it.value }
 
     return antennasByFrequency
-        .parallelStream()
-        .flatMap { it.getCombinations().stream() }
+        .flatMap { it.getCombinations() }
         .flatMap { combination ->
             if(considerResonantHarmonics) {
-                combination.getAntinodeWithResonantHarmonics(bounds).stream()
+                combination.getAntinodeWithResonantHarmonics(bounds)
             } else {
-                combination.getAntinode(bounds).stream()
+                combination.getAntinode(bounds)
             }
         }
-        .collect(toSet())
+        .toSet()
 }
 
 fun List<Antenna>.getCombinations(): List<Pair<Antenna, Antenna>> {
