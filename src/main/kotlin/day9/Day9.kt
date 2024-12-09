@@ -40,7 +40,7 @@ fun DiskMap.compact(): DiskMap {
                 val freeSpaceIndex = index
                 val freeSpace = indicator
 
-                if(freeSpaceIndex > fileIndex || freeSpace.length < file.length) continue
+                if (freeSpaceIndex > fileIndex || freeSpace.length < file.length) continue
 
                 val extraSpace = freeSpace.length - file.length
 
