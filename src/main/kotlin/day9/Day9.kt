@@ -1,24 +1,22 @@
 package day9
 
-import ext.canContain
 import util.integerSequence
 import util.swap
 
 typealias FileId = Int
 typealias Disk = MutableList<DiskElement>
+typealias DiskMap = MutableList<DiskMapIndicator>
 
-sealed class DiskMapIndicator {
-    data class LengthOfFile(val fileId: FileId, val length: Int) : DiskMapIndicator()
-    data class FreeSpace(val length: Int) : DiskMapIndicator()
+sealed class DiskMapIndicator() {
+    abstract val length: Int
+
+    data class File(val fileId: FileId, override val length: Int) : DiskMapIndicator()
+    data class FreeSpace(override val length: Int) : DiskMapIndicator()
 }
 
 sealed class DiskElement {
     data class FileData(val fileId: FileId) : DiskElement()
     object FreeSpace : DiskElement()
-}
-
-data class File(val fileId: FileId, val start: Int, val length: Int) {
-    val range: IntRange = start until start + length
 }
 
 fun Disk.defragment(): Disk {
@@ -31,17 +29,37 @@ fun Disk.defragment(): Disk {
     return this
 }
 
-fun Disk.compact(): Disk {
+fun DiskMap.compact(): DiskMap {
     val files = getFiles()
 
     for (file in files.reversed()) {
-        val freeSpaceSpans = getSpansOfFreeSpace()
-        freeSpaceSpans
-            .firstOrNull { span -> span.first < file.start && span.canContain(file.range) }
-            ?.also { span -> swap(file.range, span) }
+        val fileIndex = indexOf(file)
+
+        for ((index, indicator) in withIndex()) {
+            if (indicator is DiskMapIndicator.FreeSpace) {
+                val freeSpaceIndex = index
+                val freeSpace = indicator
+
+                if(freeSpaceIndex > fileIndex || freeSpace.length < file.length) continue
+
+                val extraSpace = freeSpace.length - file.length
+
+                this[freeSpaceIndex] = file
+                this[fileIndex] = DiskMapIndicator.FreeSpace(freeSpace.length - extraSpace)
+
+                if (extraSpace > 0) {
+                    add(freeSpaceIndex + 1, DiskMapIndicator.FreeSpace(extraSpace))
+                }
+                break
+            }
+        }
     }
 
     return this
+}
+
+fun DiskMap.getFiles(): List<DiskMapIndicator.File> {
+    return filterIsInstance<DiskMapIndicator.File>()
 }
 
 fun Disk.checksum(): Long {
@@ -55,69 +73,6 @@ fun Disk.checksum(): Long {
 
 fun Disk.getFirstFreeSpaceIndex(): Int {
     return indexOf(DiskElement.FreeSpace)
-}
-
-fun Disk.getSpansOfFreeSpace(): List<IntRange> {
-    val spans = mutableListOf<IntRange>()
-    var start = 0
-    var currentLength = 0
-
-    for (index in indices) {
-        when (this[index]) {
-            is DiskElement.FileData -> {
-                if (currentLength > 0) {
-                    spans.add(start until start + currentLength)
-                    currentLength = 0
-                }
-            }
-
-            DiskElement.FreeSpace -> {
-                if (currentLength == 0) {
-                    start = index
-                }
-                currentLength++
-            }
-        }
-    }
-
-    return spans
-}
-
-fun Disk.getFiles(): List<File> {
-    val files = mutableListOf<File>()
-    var fileId = 0
-    var start = 0
-    var currentLength = 0
-
-    for (index in indices) {
-        when (val element = this[index]) {
-            is DiskElement.FileData -> {
-                if (currentLength == 0) {
-                    start = index
-                }
-                if (element.fileId != fileId) {
-                    files.add(File(fileId, start, currentLength))
-                    start = index
-                    currentLength = 0
-                }
-                fileId = element.fileId
-                currentLength++
-            }
-
-            DiskElement.FreeSpace -> {
-                if (currentLength > 0) {
-                    files.add(File(fileId, start, currentLength))
-                    currentLength = 0
-                }
-            }
-        }
-    }
-
-    if (currentLength != 0) {
-        files.add(File(fileId, start, currentLength))
-    }
-
-    return files
 }
 
 fun Disk.printDisk(): String {
@@ -138,7 +93,7 @@ fun Disk.printDisk(): String {
 fun createDisk(indicators: Sequence<DiskMapIndicator>): Disk {
     return indicators.flatMap { indicator ->
         when (indicator) {
-            is DiskMapIndicator.LengthOfFile -> {
+            is DiskMapIndicator.File -> {
                 val fileData = DiskElement.FileData(indicator.fileId)
                 (0 until indicator.length).map { i -> fileData }
             }
@@ -156,7 +111,7 @@ fun parseDiskMap(input: String): Sequence<DiskMapIndicator> = sequence {
         val value = input[index]
         when {
             index % 2 == 0 -> yield(
-                DiskMapIndicator.LengthOfFile(fileIdSequence.next(), value.digitToInt())
+                DiskMapIndicator.File(fileIdSequence.next(), value.digitToInt())
             )
 
             else -> yield(
