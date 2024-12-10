@@ -3,7 +3,6 @@ package day10
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import util.Grid
-import util.Position
 import util.readInput
 
 class Day10KtTest {
@@ -22,7 +21,7 @@ class Day10KtTest {
         """.trimIndent()
 
         val topographicMap = Grid.fromString(input, Char::digitToInt)
-        val trailHeads: List<Position> = findTrailHeads(topographicMap)
+        val trailHeads = findTrailHeads(topographicMap)
         val score = trailHeads.sumOf { trailHead -> findReachableSummits(trailHead, topographicMap).score }
 
         assertThat(score).isEqualTo(36)
@@ -33,7 +32,7 @@ class Day10KtTest {
         val input = readInput(10)
 
         val topographicMap = Grid.fromString(input, Char::digitToInt)
-        val trailHeads: List<Position> = findTrailHeads(topographicMap)
+        val trailHeads = findTrailHeads(topographicMap)
         val score = trailHeads.sumOf { trailHead -> findReachableSummits(trailHead, topographicMap).score }
 
         assertThat(score).isEqualTo(709)
@@ -53,7 +52,7 @@ class Day10KtTest {
         """.trimIndent()
 
         val topographicMap = Grid.fromString(input, Char::digitToInt)
-        val trailHeads: List<Position> = findTrailHeads(topographicMap)
+        val trailHeads = findTrailHeads(topographicMap)
         val score = trailHeads.sumOf { trailHead -> findReachableSummits(trailHead, topographicMap).rating }
 
         assertThat(score).isEqualTo(81)
@@ -64,7 +63,7 @@ class Day10KtTest {
         val input = readInput(10)
 
         val topographicMap = Grid.fromString(input, Char::digitToInt)
-        val trailHeads: List<Position> = findTrailHeads(topographicMap)
+        val trailHeads = findTrailHeads(topographicMap)
         val score = trailHeads.sumOf { trailHead -> findReachableSummits(trailHead, topographicMap).rating }
 
         assertThat(score).isEqualTo(1326)
