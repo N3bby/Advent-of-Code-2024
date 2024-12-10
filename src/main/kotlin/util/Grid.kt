@@ -65,6 +65,10 @@ data class Grid<T>(val rows: List<List<T>>) {
             val rows = input.lines().map { it.toList() }
             return Grid(rows)
         }
+        fun <T> fromString(input: String, transform: (Char) -> T): Grid<T> {
+            val rows = input.lines().map { line -> line.toCharArray().map(transform) }
+            return Grid(rows)
+        }
     }
 }
 

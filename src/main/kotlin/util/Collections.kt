@@ -22,3 +22,7 @@ fun <T> MutableList<T>.swap(range1: IntRange, range2: IntRange){
         this[it.second] = temp
     }
 }
+
+fun <T> List<Set<T>>.combine(): Set<T> {
+    return this.fold(setOf()) { acc, set -> acc + set }
+}
