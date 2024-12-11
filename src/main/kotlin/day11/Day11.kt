@@ -15,18 +15,19 @@ value class Stone(private val value: Long) {
                 .splitInTwo()
                 .toList()
                 .map { Stone(it.toLong()) }
+
             else -> listOf(Stone(value * 2024))
         }
     }
 
     fun stonesAfterBlinks(blinks: BlinksLeft): AmountOfStones {
         val cachedValue = cache[this]?.get(blinks)
-        if(cachedValue != null) return cachedValue
+        if (cachedValue != null) return cachedValue
 
-        if(blinks == 0) return 1
+        if (blinks == 0) return 1
         val stonesAfterBlinks = blink().sumOf { it.stonesAfterBlinks(blinks - 1) }
 
-        if(!cache.contains(this)) cache[this] = mutableMapOf()
+        if (!cache.contains(this)) cache[this] = mutableMapOf()
         cache[this]?.set(blinks, stonesAfterBlinks)
 
         return stonesAfterBlinks
