@@ -10,6 +10,8 @@ repositories {
 }
 
 dependencies {
+    implementation("io.arrow-kt:arrow-core:1.2.4")
+
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.11.3")
     testImplementation("org.assertj:assertj-core:3.26.3")
 

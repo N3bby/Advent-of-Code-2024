@@ -7,3 +7,7 @@ fun <T: Comparable<T>> Pair<T, T>.sort(): Pair<T, T> {
         this
     }
 }
+
+fun <T> Pair<T, T>.toList(): List<T> {
+    return listOf(first, second)
+}
