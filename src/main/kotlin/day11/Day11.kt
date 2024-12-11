@@ -7,8 +7,8 @@ typealias BlinksLeft = Int
 typealias AmountOfStones = Long
 
 @JvmInline
-value class Stone(val value: Long) {
-    fun blink(): List<Stone> {
+value class Stone(private val value: Long) {
+    private fun blink(): List<Stone> {
         return when {
             value == 0L -> listOf(Stone(1))
             value.toString().length % 2 == 0 -> value.toString()
@@ -35,7 +35,7 @@ value class Stone(val value: Long) {
 
 val cache = mutableMapOf<Stone, MutableMap<BlinksLeft, AmountOfStones>>()
 
-fun List<Stone>.stonesAfterBlinks(blinks: Int): Long {
+fun List<Stone>.stonesAfterBlinks(blinks: BlinksLeft): AmountOfStones {
     return sumOf { it.stonesAfterBlinks(blinks) }
 }
 
