@@ -4,7 +4,6 @@ import util.Grid
 import util.Offset
 import util.Position
 import util.getContiguousGroups
-import kotlin.math.abs
 
 data class Region(private val positions: Set<Position>, private val grid: Grid<Char>) {
 
@@ -16,16 +15,14 @@ data class Region(private val positions: Set<Position>, private val grid: Grid<C
         return area * sides
     }
 
-    val valueInGrid: Char get() = grid.getAtPosition(positions.first())
+    val value: Char get() = grid.getAtPosition(positions.first())
 
     private val area: Int get() = positions.size
 
     private val perimeter: Int
-        get() {
-            return positions.sumOf { position ->
-                val value = grid.getAtPosition(position)
-                position.neighbours.count { !grid.isInBounds(it) || grid.getAtPosition(it) != value }
-            }
+        get() = positions.sumOf { position ->
+            val value = grid.getAtPosition(position)
+            position.neighbours.count { !grid.isInBounds(it) || grid.getAtPosition(it) != value }
         }
 
     val sides: Int
@@ -41,17 +38,23 @@ fun getCornersAtPosition(position: Position, positions: Set<Position>): Set<Corn
     return position.sectors.mapNotNull { sector ->
         val filledSpacesInSector = sector.filter { positions.contains(it) }
         val emptySpacesInSector = sector.filter { !positions.contains(it) }
-        if(emptySpacesInSector.size == 2) {
-            val offsetBetweenEmptySpaces = (emptySpacesInSector[0] - emptySpacesInSector[1]).abs()
-            if (offsetBetweenEmptySpaces == Offset(1, 1)) {
-                setOf(position) to emptySpacesInSector.toSet()
-            } else {
+        when (emptySpacesInSector.size) {
+            2 -> {
+                val offsetBetweenEmptySpaces = (emptySpacesInSector[0] - emptySpacesInSector[1]).abs()
+                if (offsetBetweenEmptySpaces == Offset(1, 1)) {
+                    setOf(position) to emptySpacesInSector.toSet()
+                } else {
+                    null
+                }
+            }
+
+            1, 3 -> {
+                filledSpacesInSector.toSet() to emptySpacesInSector.toSet()
+            }
+
+            else -> {
                 null
             }
-        } else if(emptySpacesInSector.size == 1 || emptySpacesInSector.size == 3) {
-            filledSpacesInSector.toSet() to emptySpacesInSector.toSet()
-        } else {
-            null
         }
     }.toSet()
 }

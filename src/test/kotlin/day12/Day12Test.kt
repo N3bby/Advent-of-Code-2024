@@ -60,7 +60,7 @@ class Day12KtTest {
         val grid = Grid.fromString(input)
         val region = grid.getContiguousGroups()
             .map { Region(it, grid) }
-            .first { region -> region.valueInGrid == '#' }
+            .first { region -> region.value == '#' }
 
         assertThat(region.sides).isEqualTo(expectedSides)
     }
@@ -79,7 +79,7 @@ class Day12KtTest {
         val grid = Grid.fromString(input)
         val sidesPerRegion = grid.getContiguousGroups()
             .map { Region(it, grid) }
-            .map { region -> region.valueInGrid to region.sides }
+            .map { region -> region.value to region.sides }
         val totalPrice = getTotalPriceOfFencing(grid, Region::priceOfFencingDiscounted)
 
         assertThat(sidesPerRegion).containsExactlyInAnyOrder(
@@ -108,7 +108,7 @@ class Day12KtTest {
         val grid = Grid.fromString(input)
         val sidesPerRegion = grid.getContiguousGroups()
             .map { Region(it, grid) }
-            .map { region -> region.valueInGrid to region.sides }
+            .map { region -> region.value to region.sides }
         val totalPrice = getTotalPriceOfFencing(grid, Region::priceOfFencingDiscounted)
 
         assertThat(sidesPerRegion).containsExactlyInAnyOrder(
@@ -132,10 +132,6 @@ class Day12KtTest {
         val input = readInput(12)
 
         val grid = Grid.fromString(input)
-        val sidesPerRegion = grid.getContiguousGroups()
-            .map { Region(it, grid) }
-            .map { region -> region.valueInGrid to region.sides }
-        println(sidesPerRegion.size)
         val totalPrice = getTotalPriceOfFencing(grid, Region::priceOfFencingDiscounted)
 
         assertThat(totalPrice).isEqualTo(869070)
