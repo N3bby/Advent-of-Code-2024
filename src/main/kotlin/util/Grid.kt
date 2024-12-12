@@ -101,16 +101,16 @@ fun <T> Grid<T>.getContiguousGroups(): Set<Set<Position>> {
 fun <T> Grid<T>.getContiguousGroup(
     position: Position,
     value: T,
-    visited: Set<Position> = emptySet<Position>(),
+    visited: MutableSet<Position> = mutableSetOf<Position>(),
 ): Set<Position> {
+    visited.add(position)
+
     val positionsToVisit = position.neighbours
         .filter { isInBounds(it) }
         .filter { getAtPosition(it) == value }
         .filter { !visited.contains(it) }
 
-    if (positionsToVisit.isEmpty()) return visited + position
+    positionsToVisit.forEach { positionToVisit -> getContiguousGroup(positionToVisit, value, visited) }
 
-    return positionsToVisit.fold(visited + position) { visitedAccumulator, positionToVisit ->
-        getContiguousGroup(positionToVisit, value, visitedAccumulator)
-    }
+    return visited
 }
