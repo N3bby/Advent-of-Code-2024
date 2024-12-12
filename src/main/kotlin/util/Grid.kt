@@ -83,3 +83,34 @@ fun Grid<Char>.matchesKernelAtPosition(position: Position, kernel: Grid<Char>, w
     }
 }
 
+fun <T> Grid<T>.getContiguousGroups(): Set<Set<Position>> {
+    val visited: MutableSet<Position> = HashSet(width * height)
+    val groups = mutableSetOf<Set<Position>>()
+
+    for (position in positions) {
+        if (visited.contains(position)) continue
+
+        val group = getContiguousGroup(position, getAtPosition(position))
+        groups.add(group)
+        visited.addAll(group)
+    }
+
+    return groups
+}
+
+fun <T> Grid<T>.getContiguousGroup(
+    position: Position,
+    value: T,
+    visited: Set<Position> = emptySet<Position>(),
+): Set<Position> {
+    val positionsToVisit = position.neighbours
+        .filter { isInBounds(it) }
+        .filter { getAtPosition(it) == value }
+        .filter { !visited.contains(it) }
+
+    if (positionsToVisit.isEmpty()) return visited + position
+
+    return positionsToVisit.fold(visited + position) { visitedAccumulator, positionToVisit ->
+        getContiguousGroup(positionToVisit, value, visitedAccumulator)
+    }
+}
