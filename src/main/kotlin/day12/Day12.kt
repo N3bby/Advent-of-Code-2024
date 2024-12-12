@@ -26,10 +26,7 @@ data class Region(private val positions: Set<Position>, private val grid: Grid<C
         }
 
     val sides: Int
-        get() {
-            val corners = positions.flatMap { getCornersAtPosition(it, positions) }.toSet()
-            return corners.size
-        }
+        get() = positions.flatMap { getCornersAtPosition(it, positions) }.toSet().size
 }
 
 typealias Corner = Pair<Set<Position>, Set<Position>>
