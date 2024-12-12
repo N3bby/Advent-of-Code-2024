@@ -1,7 +1,8 @@
 package util
 
-import java.lang.IllegalArgumentException
-import kotlin.math.*
+import kotlin.math.abs
+import kotlin.math.max
+import kotlin.math.min
 
 data class Position(val x: Int, val y: Int) : Comparable<Position> {
     operator fun plus(offset: Offset): Position {
@@ -10,6 +11,10 @@ data class Position(val x: Int, val y: Int) : Comparable<Position> {
 
     operator fun minus(offset: Offset): Position {
         return Position(x - offset.x, y - offset.y)
+    }
+
+    operator fun minus(offset: Position): Offset {
+        return Offset(x - offset.x, y - offset.y)
     }
 
     val neighbours: List<Position>
@@ -21,6 +26,14 @@ data class Position(val x: Int, val y: Int) : Comparable<Position> {
                 this + Offset(0, -1),
             )
         }
+
+    val sectors: List<List<Position>>
+        get() = listOf(
+            listOf(this, this + Offset(1, 0), this + Offset(1, 1), this + Offset(0, 1)),
+            listOf(this, this + Offset(0, 1), this + Offset(-1, 1), this + Offset(-1, 0)),
+            listOf(this, this + Offset(-1, 0), this + Offset(-1, -1), this + Offset(0, -1)),
+            listOf(this, this + Offset(0, -1), this + Offset(1, -1), this + Offset(1, 0)),
+        )
 
     fun manhattanDistanceFrom(other: Position): Int {
         return abs(other.x - x) + abs(other.y - y)
@@ -53,7 +66,11 @@ data class Line(val pos1: Position, val pos2: Position) {
 
 }
 
-data class Offset(val x: Int, val y: Int)
+data class Offset(val x: Int, val y: Int) {
+    fun abs(): Offset {
+        return Offset(abs(x), abs(y))
+    }
+}
 
 enum class Direction(val offset: Offset) {
     RIGHT(Offset(1, 0)),
@@ -82,4 +99,8 @@ enum class Direction(val offset: Offset) {
             else -> throw IllegalArgumentException("No char for $this")
         }
     }
+}
+
+fun List<Position>.sortedByPosition(): List<Position> {
+    return sortedWith { a, b -> compareValuesBy(a, b, { it.y }, { it.x }) }
 }

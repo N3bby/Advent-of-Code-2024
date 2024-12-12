@@ -60,6 +60,20 @@ data class Grid<T>(val rows: List<List<T>>) {
         )
     }
 
+    fun print(highlighter: (Position) -> T?): String {
+        val stringBuilder = StringBuilder()
+        for (y in 0 until height) {
+            for (x in 0 until width) {
+                val position = Position(x, y)
+                val value = getAtPosition(position)
+                val highlighted = highlighter(position)
+                stringBuilder.append(highlighted ?: value)
+            }
+            stringBuilder.append("\n")
+        }
+        return stringBuilder.toString()
+    }
+
     companion object {
         fun fromString(input: String): Grid<Char> {
             val rows = input.lines().map { it.toList() }
