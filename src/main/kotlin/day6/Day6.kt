@@ -105,13 +105,8 @@ fun findDistinctVisitedPositions(map: Map, guard: Guard): Int {
 
 fun findManualObstructionsThatCauseLoop(map: Map, guard: Guard): Int {
     val positionsToCheck = guard.makeCopy().moveUntilOutOfBounds(map).visitedPositionsSet.map { it.first }.toSet()
-    var positionsChecked = 0
 
     return positionsToCheck.parallelStream()
-        .peek {
-            positionsChecked++
-            if (positionsChecked % 1000 == 0) println("${positionsChecked}/${positionsToCheck.count()}")
-        }
         .filter { position ->
             when {
                 map.isObstructed(position) || position == guard.position -> false
