@@ -1,9 +1,36 @@
 package util
 
+import kotlin.math.ceil
+
 data class Bounds(val width: Int, val height: Int) {
+
+    val quadrants: List<Region>
+        get() = listOf(
+            Region(0, width / 2, 0, height / 2),
+            Region(0, width / 2, ceil(height/2.0).toInt(), height),
+            Region(ceil(width / 2.0).toInt(), width, 0, height / 2),
+            Region(ceil(width / 2.0).toInt(), width, ceil(height/2.0).toInt(), height),
+        )
+
     fun contains(position: Position): Boolean {
         return position.x in 0 until width &&
                 position.y in 0 until height
+    }
+
+    fun loop(position: Position): Position {
+        val x = position.x % width
+        val y = position.y % height
+        return Position(
+            if(x < 0) width + x else x,
+            if(y < 0) height + y else y
+        )
+    }
+}
+
+data class Region(val minX: Int, val maxX: Int, val minY: Int, val maxY: Int) {
+    fun contains(position: Position): Boolean {
+        return position.x in minX until maxX &&
+                position.y in minY until maxY
     }
 }
 
@@ -79,6 +106,7 @@ data class Grid<T>(val rows: List<List<T>>) {
             val rows = input.lines().map { it.toList() }
             return Grid(rows)
         }
+
         fun <T> fromString(input: String, transform: (Char) -> T): Grid<T> {
             val rows = input.lines().map { line -> line.toCharArray().map(transform) }
             return Grid(rows)
