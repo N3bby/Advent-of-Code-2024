@@ -40,13 +40,22 @@ class Day13KtTest {
 
         val clawMachines = parseClawMachines(input)
         val totalCheapestPrice = clawMachines
-            .parallelStream()
-            .map { it.findCheapestInputCombination() }
-            .filter { it != null }
-            .mapToInt { it!!.tokenPrice }
-            .sum()
+            .mapNotNull { it.findCheapestInputCombination() }
+            .sumOf { it.tokenPrice }
 
         assertThat(totalCheapestPrice).isEqualTo(27157)
+    }
+
+    @Test
+    fun `part 2 - puzzle input`() {
+        val input = readInput(13)
+
+        val clawMachines = parseClawMachines(input, fixUnitConversion = true)
+        val totalCheapestPrice = clawMachines
+            .mapNotNull { it.findCheapestInputCombination() }
+            .sumOf { it.tokenPrice }
+
+        assertThat(totalCheapestPrice).isEqualTo(104015411578548)
 
     }
 }

@@ -4,6 +4,8 @@ import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
+data class LongPosition(val x: Long, val y: Long)
+
 data class Position(val x: Int, val y: Int) : Comparable<Position> {
     operator fun plus(offset: Offset): Position {
         return Position(x + offset.x, y + offset.y)
