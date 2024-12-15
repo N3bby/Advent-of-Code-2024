@@ -1,5 +1,6 @@
 package day14
 
+import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -63,6 +64,21 @@ class Day14KtTest {
 
         // Test outputs an image file to <PROJECT_ROOT>/img
         // My answer was: 8280
+    }
+
+    @Test
+    @Disabled("Takes about a minute to run")
+    fun `part 2 - puzzle input - using variances`() {
+        // This seems like a more general solution for if you don't know what the tree looks like
+        // Not sure though...
+
+        val input = readInput(14)
+
+        val robots = parseRobots(input)
+        val bounds = Bounds(101, 103)
+        val second = robots.getSecondWithClosestRobots(bounds)
+
+        assertThat(second).isEqualTo(8280)
     }
 }
 
