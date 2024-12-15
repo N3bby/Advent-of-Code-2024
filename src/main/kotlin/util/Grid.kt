@@ -1,5 +1,11 @@
 package util
 
+import java.awt.Color
+import java.awt.image.BufferedImage
+import java.awt.image.BufferedImage.TYPE_INT_RGB
+import java.io.File
+import javax.imageio.ImageIO
+import kotlin.math.abs
 import kotlin.math.ceil
 
 data class Bounds(val width: Int, val height: Int) {
@@ -7,9 +13,9 @@ data class Bounds(val width: Int, val height: Int) {
     val quadrants: List<Region>
         get() = listOf(
             Region(0, width / 2, 0, height / 2),
-            Region(0, width / 2, ceil(height/2.0).toInt(), height),
+            Region(0, width / 2, ceil(height / 2.0).toInt(), height),
             Region(ceil(width / 2.0).toInt(), width, 0, height / 2),
-            Region(ceil(width / 2.0).toInt(), width, ceil(height/2.0).toInt(), height),
+            Region(ceil(width / 2.0).toInt(), width, ceil(height / 2.0).toInt(), height),
         )
 
     fun contains(position: Position): Boolean {
@@ -21,8 +27,8 @@ data class Bounds(val width: Int, val height: Int) {
         val x = position.x % width
         val y = position.y % height
         return Position(
-            if(x < 0) width + x else x,
-            if(y < 0) height + y else y
+            if (x < 0) width + x else x,
+            if (y < 0) height + y else y
         )
     }
 }
@@ -111,6 +117,17 @@ data class Grid<T>(val rows: List<List<T>>) {
             val rows = input.lines().map { line -> line.toCharArray().map(transform) }
             return Grid(rows)
         }
+
+        fun <T> generate(bounds: Bounds, generator: (Position) -> T): Grid<T> {
+            val rows = mutableListOf<MutableList<T>>()
+            for (y in 0..<bounds.height) {
+                rows.add(mutableListOf())
+                for (x in 0..<bounds.width) {
+                    rows[y].add(generator(Position(x, y)))
+                }
+            }
+            return Grid(rows)
+        }
     }
 }
 
@@ -123,6 +140,82 @@ fun Grid<Char>.matchesKernelAtPosition(position: Position, kernel: Grid<Char>, w
             isInBounds(positionToCheck) && getAtPosition(positionToCheck) == kernel.getAtPosition(kernelPosition)
         }
     }
+}
+
+fun Grid<Int>.matchesKernelAtPosition(position: Position, kernel: Grid<Int>): Boolean {
+    return kernel.positions.all { kernelPosition ->
+        val positionToCheck = position + kernelPosition.toOffset()
+        isInBounds(positionToCheck) && getAtPosition(positionToCheck) == kernel.getAtPosition(kernelPosition)
+    }
+}
+
+fun <T, R> Grid<T>.map(mapper: (Position, T) -> R): Grid<R> {
+    return Grid.generate(bounds) { position ->
+        mapper(position, getAtPosition(position))
+    }
+}
+
+val blockDetectionKernel = Grid(
+    listOf(
+        listOf(1, 1, 1),
+        listOf(1, 1, 1),
+        listOf(1, 1, 1)
+    )
+)
+
+val horizontalEdgeDetectionKernel = Grid(
+    listOf(
+        listOf(-1, -1, -1),
+        listOf(0, 0, 0),
+        listOf(1, 1, 1)
+    )
+)
+val verticalEdgeDetectionKernel = Grid(
+    listOf(
+        listOf(-1, 0, 1),
+        listOf(-1, 0, 1),
+        listOf(-1, 0, 1)
+    )
+)
+
+fun Grid<Int>.convolution(kernel: Grid<Int>): Grid<Int> {
+    return map { gridPosition, value ->
+        kernel.positions.sumOf { kernelPosition ->
+            val positionToCheck = gridPosition + kernelPosition.toOffset()
+            if (isInBounds(positionToCheck)) {
+                getAtPosition(positionToCheck) * kernel.getAtPosition(kernelPosition)
+            } else {
+                0
+            }
+        }
+    }
+}
+
+fun Grid<Int>.convolution(kernels: List<Grid<Int>>): Grid<Int> {
+    val convolutedGrids = kernels.map { convolution(it) }
+    return map { position, _ ->
+        convolutedGrids.maxOf { it.getAtPosition(position) }
+    }
+}
+
+fun Grid<Int>.totalAbsValue(): Int {
+    return positions.sumOf { abs(getAtPosition(it)) }
+}
+
+fun Grid<Int>.renderToImage(file: File) {
+    val image = BufferedImage(bounds.width, bounds.height, TYPE_INT_RGB)
+    val white = Color(255, 255, 255)
+    val black = Color(0, 0, 0)
+
+    positions.forEach {
+        if (getAtPosition(it) > 0) {
+            image.setRGB(it.x, it.y, black.rgb)
+        } else {
+            image.setRGB(it.x, it.y, white.rgb)
+        }
+    }
+
+    ImageIO.write(image, "png", file)
 }
 
 fun <T> Grid<T>.getContiguousGroups(): Set<Set<Position>> {

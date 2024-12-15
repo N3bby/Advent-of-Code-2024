@@ -1,9 +1,12 @@
 package day14
 
 import ext.multiplication
-import util.Bounds
-import util.Offset
-import util.Position
+import util.*
+import java.awt.Color
+import java.awt.image.BufferedImage
+import java.awt.image.BufferedImage.TYPE_INT_RGB
+import java.io.File
+import javax.imageio.ImageIO
 
 data class Robot(val position: Position, val velocity: Offset) {
     fun move(bounds: Bounds): Robot {
@@ -16,9 +19,29 @@ data class Robot(val position: Position, val velocity: Offset) {
 
 fun List<Robot>.move(seconds: Int, bounds: Bounds): List<Robot> {
     return (0 until seconds)
-        .fold(this) { robots, _ ->
+        .fold(this) { robots, second ->
             robots.map { robot -> robot.move(bounds) }
         }
+}
+
+fun List<Robot>.moveUntilChristmasTree(bounds: Bounds, limit: Int = 15000) {
+    var second = 0
+    var robots = this
+
+    while (second < limit) {
+        robots = robots.map { robot -> robot.move(bounds) }
+        second++
+
+        val grid = robots.toGrid(bounds)
+        val hasABlockOfRobots = grid.positions
+            .any { grid.matchesKernelAtPosition(it, blockDetectionKernel) }
+
+        if (hasABlockOfRobots) {
+            println("Rendering $second")
+            robots.renderToFile(bounds, second)
+            return
+        }
+    }
 }
 
 fun List<Robot>.getSafetyFactor(bounds: Bounds): Int {
@@ -27,8 +50,26 @@ fun List<Robot>.getSafetyFactor(bounds: Bounds): Int {
     }.multiplication()
 }
 
-fun List<Robot>.print(bounds: Bounds) {
+fun List<Robot>.renderToFile(bounds: Bounds, second: Int) {
+    val image = BufferedImage(bounds.width, bounds.height, TYPE_INT_RGB)
+    val white = Color(255, 255, 255)
+    val black = Color(0, 0, 0)
+    for (y in 0 until bounds.height) {
+        for (x in 0 until bounds.width) {
+            val isRobotHere = any { it.position == Position(x, y) }
+            if (isRobotHere) {
+                image.setRGB(x, y, black.rgb)
+            } else {
+                image.setRGB(x, y, white.rgb)
+            }
+        }
+    }
+    ImageIO.write(image, "png", File("img/$second.png"))
+}
+
+fun List<Robot>.print(bounds: Bounds, second: Int) {
     val stringBuilder = StringBuilder()
+    stringBuilder.append("After $second seconds:\n")
     for (y in 0 until bounds.height) {
         for (x in 0 until bounds.width) {
             val robotsHere = count { it.position == Position(x, y) }
@@ -36,7 +77,14 @@ fun List<Robot>.print(bounds: Bounds) {
         }
         stringBuilder.append('\n')
     }
+    stringBuilder.append('\n')
     println(stringBuilder.toString())
+}
+
+fun List<Robot>.toGrid(bounds: Bounds): Grid<Int> {
+    return Grid.generate(bounds) { position ->
+        count { it.position == position }
+    }
 }
 
 fun parseRobots(input: String): List<Robot> {

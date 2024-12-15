@@ -1,9 +1,15 @@
 package day14
 
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import util.Bounds
+import util.Grid
+import util.convolution
+import util.horizontalEdgeDetectionKernel
+import util.map
 import util.readInput
+import util.totalAbsValue
 
 class Day14KtTest {
 
@@ -46,6 +52,17 @@ class Day14KtTest {
         assertThat(safetyFactor).isEqualTo(231019008)
     }
 
+    @Test
+    @Disabled("Takes 30 seconds too run, and doesn't have an automatic assertion")
+    fun `part 2 - puzzle input`() {
+        val input = readInput(14)
 
+        val robots = parseRobots(input)
+        val bounds = Bounds(101, 103)
+        robots.moveUntilChristmasTree(bounds)
+
+        // Test outputs an image file to <PROJECT_ROOT>/img
+        // My answer was: 8280
+    }
 }
 
