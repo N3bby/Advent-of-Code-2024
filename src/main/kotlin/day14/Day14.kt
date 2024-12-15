@@ -44,18 +44,17 @@ fun List<Robot>.moveUntilChristmasTree(bounds: Bounds, limit: Int = 15000) {
     }
 }
 
-fun List<Robot>.getSecondWithClosestRobots(bounds: Bounds, limit: Int = 10000): Int {
+fun List<Robot>.getSecondWithLeastVariance(bounds: Bounds, limit: Int = 10000): Int {
     val variances = mutableListOf<Int>()
     (0 until limit)
         .fold(this) { robots, second ->
             val movedRobots = robots.map { robot -> robot.move(bounds) }
-            val totalRobotDistances = cartesianProduct(robots, robots)
-                .parallelStream()
-                .mapToInt { (robot1, robot2) ->
-                    robot1.position.manhattanDistanceFrom(robot2.position)
-                }
-                .sum()
-            variances.add(totalRobotDistances)
+
+            val totalVariance = robots.zipWithNext().sumOf { (robot1, robot2) ->
+                robot1.position.manhattanDistanceFrom(robot2.position)
+            }
+            variances.add(totalVariance)
+
             movedRobots
         }
     return variances.indexOf(variances.min())

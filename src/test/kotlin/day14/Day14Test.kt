@@ -61,7 +61,6 @@ class Day14KtTest {
     }
 
     @Test
-    @Disabled("Takes about a minute to run")
     fun `part 2 - puzzle input - using variances`() {
         // This seems like a more general solution for if you don't know what the tree looks like
         // Not sure though...
@@ -70,7 +69,7 @@ class Day14KtTest {
 
         val robots = parseRobots(input)
         val bounds = Bounds(101, 103)
-        val second = robots.getSecondWithClosestRobots(bounds)
+        val second = robots.getSecondWithLeastVariance(bounds)
 
         assertThat(second).isEqualTo(8280)
     }
