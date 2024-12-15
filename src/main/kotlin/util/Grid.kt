@@ -93,6 +93,14 @@ data class Grid<T>(val rows: List<List<T>>) {
         )
     }
 
+    fun invertRows(): Grid<T> {
+        return Grid(rows.reversed())
+    }
+
+    fun print(): String {
+        return print { null }
+    }
+
     fun print(highlighter: (Position) -> T?): String {
         val stringBuilder = StringBuilder()
         for (y in 0 until height) {
