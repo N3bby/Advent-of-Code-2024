@@ -1,6 +1,7 @@
 package day15
 
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import util.readInput
 
@@ -97,6 +98,7 @@ class Day15KtTest {
     }
 
     @Test
+    @Disabled("This test has no assertion; it is used to manually check the movements for part 2")
     fun `part 2 - small example input`() {
         val input = """
             #######
@@ -112,12 +114,7 @@ class Day15KtTest {
 
         val (warehouse, movements) = parseWarehouseAndMovements(input, expandWarehouse = true)
 
-        val gpsCoordinatesSum = warehouse
-            .executeMovements(movements, debug = true)
-            .getGpsCoordinates()
-            .sum()
-
-        // We have no assertion for this test
+        warehouse.executeMovements(movements, debug = true)
     }
 
     @Test
