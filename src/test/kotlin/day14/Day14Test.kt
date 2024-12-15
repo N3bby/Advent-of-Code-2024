@@ -1,16 +1,10 @@
 package day14
 
-import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import util.Bounds
-import util.Grid
-import util.convolution
-import util.horizontalEdgeDetectionKernel
-import util.map
 import util.readInput
-import util.totalAbsValue
 
 class Day14KtTest {
 
