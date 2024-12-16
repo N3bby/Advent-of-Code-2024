@@ -84,6 +84,14 @@ enum class Direction(val offset: Offset) {
     DOWN(Offset(0, -1)),
     RIGHT_DOWN(Offset(1, -1));
 
+    fun turnLeft(): Direction = when (this) {
+        RIGHT -> UP
+        DOWN -> RIGHT
+        LEFT -> DOWN
+        UP -> LEFT
+        else -> throw IllegalArgumentException("Cannot rotate right from $this")
+    }
+
     fun turnRight(): Direction = when (this) {
         RIGHT -> DOWN
         DOWN -> LEFT

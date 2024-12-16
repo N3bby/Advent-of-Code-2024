@@ -43,7 +43,7 @@ data class Region(val minX: Int, val maxX: Int, val minY: Int, val maxY: Int) {
 /**
  * Grid with origin defined in the top left corner
  */
-data class Grid<T>(val rows: List<List<T>>) {
+data class Grid<T> private constructor(val rows: List<MutableList<T>>) {
 
     val width = rows[0].size
     val height = rows.size
@@ -69,6 +69,10 @@ data class Grid<T>(val rows: List<List<T>>) {
         return rows[position.y][position.x]
     }
 
+    fun setAtPosition(position: Position, value: T) {
+        rows[position.y][position.x] = value
+    }
+
     fun getPositionsWhere(predicate: (position: Position) -> Boolean): List<Position> {
         val matchingCells = mutableListOf<Position>()
 
@@ -81,12 +85,12 @@ data class Grid<T>(val rows: List<List<T>>) {
 
     fun insertRow(index: Int, row: List<T>): Grid<T> {
         if (row.size != width) throw IllegalArgumentException("Inserted row (width ${row.size}) must be the same width as the grid (width $width)")
-        return Grid(rows.take(index) + listOf(row) + rows.drop(index))
+        return Grid.from(rows.take(index) + listOf(row) + rows.drop(index))
     }
 
     fun insertColumn(index: Int, column: List<T>): Grid<T> {
         if (column.size != height) throw IllegalArgumentException("Inserted column (height ${column.size}) must be the same height as the grid (height $height)")
-        return Grid(
+        return Grid.from(
             rows.mapIndexed { rowIndex, row ->
                 row.take(index) + listOf(column[rowIndex]) + row.drop(index)
             }
@@ -116,14 +120,18 @@ data class Grid<T>(val rows: List<List<T>>) {
     }
 
     companion object {
+        fun <T> from(rows: List<List<T>>): Grid<T> {
+            return Grid(rows.map { it.toMutableList() })
+        }
+
         fun fromString(input: String): Grid<Char> {
             val rows = input.lines().map { it.toList() }
-            return Grid(rows)
+            return from(rows)
         }
 
         fun <T> fromString(input: String, transform: (Char) -> T): Grid<T> {
             val rows = input.lines().map { line -> line.toCharArray().map(transform) }
-            return Grid(rows)
+            return from(rows)
         }
 
         fun <T> generate(bounds: Bounds, generator: (Position) -> T): Grid<T> {
@@ -163,7 +171,7 @@ fun <T, R> Grid<T>.map(mapper: (Position, T) -> R): Grid<R> {
     }
 }
 
-val blockDetectionKernel = Grid(
+val blockDetectionKernel = Grid.from(
     listOf(
         listOf(1, 1, 1),
         listOf(1, 1, 1),
@@ -171,14 +179,14 @@ val blockDetectionKernel = Grid(
     )
 )
 
-val horizontalEdgeDetectionKernel = Grid(
+val horizontalEdgeDetectionKernel = Grid.from(
     listOf(
         listOf(-1, -1, -1),
         listOf(0, 0, 0),
         listOf(1, 1, 1)
     )
 )
-val verticalEdgeDetectionKernel = Grid(
+val verticalEdgeDetectionKernel = Grid.from(
     listOf(
         listOf(-1, 0, 1),
         listOf(-1, 0, 1),
