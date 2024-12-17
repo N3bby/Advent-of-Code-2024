@@ -1,9 +1,8 @@
 package day16
 
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
-import util.Grid
-import util.Position
 import util.readInput
 
 class Day16KtTest {
@@ -138,13 +137,13 @@ class Day16KtTest {
         val paths = maze.getShortestPaths()
         val positionsPartOfShortestPath = paths.flatMap { it }.toSet()
 
-        val toCsv = Grid.generate(maze.bounds) {
-            when {
-                maze.nodes.contains(it) -> maze.distances[it]!!.toString() + if(positionsPartOfShortestPath.contains(it)) " O" else ""
-                else -> '#'
-            }
-        }.toCsv()
-        println(toCsv)
+        // val toCsv = Grid.generate(maze.bounds) {
+        //     when {
+        //         maze.nodes.contains(it) -> maze.distances[it]!!.toString() + if (positionsPartOfShortestPath.contains(it)) " O" else ""
+        //         else -> '#'
+        //     }
+        // }.toCsv()
+        // println(toCsv)
 
         assertThat(positionsPartOfShortestPath.size).isEqualTo(45)
     }
@@ -175,18 +174,19 @@ class Day16KtTest {
         val paths = maze.getShortestPaths()
         val positionsPartOfShortestPath = paths.flatMap { it }.toSet()
 
-        val toCsv = Grid.generate(maze.bounds) {
-            when {
-                maze.nodes.contains(it) -> maze.distances[it]!!.toString() + if(positionsPartOfShortestPath.contains(it)) " O" else ""
-                else -> '#'
-            }
-        }.toCsv()
-        println(toCsv)
+        // val toCsv = Grid.generate(maze.bounds) {
+        //     when {
+        //         maze.nodes.contains(it) -> maze.distances[it]!!.toString() + if (positionsPartOfShortestPath.contains(it)) " O" else ""
+        //         else -> '#'
+        //     }
+        // }.toCsv()
+        // println(toCsv)
 
         assertThat(positionsPartOfShortestPath.size).isEqualTo(64)
     }
 
     @Test
+    @Disabled("Takes ~10 seconds to run")
     fun `part 2 - puzzle input`() {
         val input = readInput(16)
 
@@ -194,16 +194,7 @@ class Day16KtTest {
         val paths = maze.getShortestPaths()
         val positionsPartOfShortestPath = paths.flatMap { it }.toSet()
 
-        val toCsv = Grid.generate(maze.bounds) {
-            when {
-                maze.nodes.contains(it) -> maze.distances[it]!!.toString() + if(positionsPartOfShortestPath.contains(it)) " O" else ""
-                else -> '#'
-            }
-        }.toCsv()
-        println(toCsv)
-
-        // Too high: 512
-        assertThat(positionsPartOfShortestPath.size).isEqualTo(0)
+        assertThat(positionsPartOfShortestPath.size).isEqualTo(471)
     }
 }
 

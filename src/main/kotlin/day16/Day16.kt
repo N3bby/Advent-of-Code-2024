@@ -1,8 +1,7 @@
 package day16
 
+import ext.accumulationMap
 import util.*
-import kotlin.getValue
-import kotlin.math.abs
 import kotlin.math.min
 
 typealias Path = List<Position>
@@ -32,23 +31,44 @@ data class Maze(
 ) {
     val nodes by lazy { walkable + start + end }
     val distances by lazy { computeDistancesFromStart() }
+    val shortestPath by lazy { getShortestPath()!! }
 
     fun getLowestScore(): Int {
         return distances[end]!!
     }
 
-    fun getShortestPaths(visited: Path = listOf(end)): Set<Path> {
-        TODO()
+    fun getShortestPaths(): Set<Path> {
+        val pathsChecked = mutableSetOf<Path>()
+        var pathsToCheck = mutableSetOf<Path>(shortestPath)
+
+        while (pathsToCheck.isNotEmpty()) {
+            val optimalPaths: Set<Path> = pathsToCheck.flatMap {
+                it.accumulationMap { pathSoFar ->
+                    pathSoFar.last().neighbours
+                        .filter { nodes.contains(it) }
+                        .filter { !shortestPath.contains(it) }
+                        .mapNotNull { getShortestPath(pathSoFar + it) }
+                        .filter { it.reversed().getScore() == getLowestScore() }
+                }.flatMap { it }
+            }.toSet()
+
+            pathsChecked.addAll(pathsToCheck)
+            pathsToCheck = (optimalPaths - pathsChecked).toMutableSet()
+        }
+
+        return pathsChecked
     }
 
     // Gets "a" shortest path
-    fun getShortestPath(visited: Path = listOf(end)): Path {
+    fun getShortestPath(visited: Path = listOf(end)): Path? {
         if (visited.last() == start) return visited
 
         val neighbourClosestToStart = visited.last().neighbours
             .filter { nodes.contains(it) }
             .filter { !visited.contains(it) }
-            .minBy { distances[it]!! }
+            .minByOrNull { distances[it]!! }
+
+        if (neighbourClosestToStart == null) return null
 
         return getShortestPath(visited + neighbourClosestToStart)
     }
@@ -73,7 +93,7 @@ data class Maze(
                 .filter { unvisited.contains(it) }
                 .forEach { neighbour ->
                     val directionToNeighbour = neighbour - currentNode
-                    val distanceFromCurrent = if(currentDirection != directionToNeighbour) 1001 else 1
+                    val distanceFromCurrent = if (currentDirection != directionToNeighbour) 1001 else 1
                     distances[neighbour] = min(
                         distances[neighbour]!!,
                         distances[currentNode]!! + distanceFromCurrent
