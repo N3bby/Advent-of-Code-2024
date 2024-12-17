@@ -25,3 +25,9 @@ fun <T> List<T>.dropAt(index: Int): List<T> = toMutableList().also { it.removeAt
 fun <T> List<T>.allIndexed(predicate: (index: Int, value: T) -> Boolean): Boolean {
     return filterIndexed { index, value -> predicate(index, value) }.size == size
 }
+
+fun <T, R> List<T>.accumulationMap(mapper: (acc: List<T>) -> R): List<R> {
+    return indices.map { index ->
+        mapper(take(index + 1))
+    }
+}

@@ -1,10 +1,28 @@
 package day16
 
-import util.Bounds
-import util.Grid
-import util.Offset
-import util.Position
+import util.*
+import kotlin.getValue
+import kotlin.math.abs
 import kotlin.math.min
+
+typealias Path = List<Position>
+
+fun Path.getScore(): Int {
+    var direction = Direction.RIGHT.offset
+    var score = 0
+
+    zipWithNext().map { (current, next) ->
+        var directionToNext = next - current
+        if (directionToNext != direction) {
+            score += 1001
+        } else {
+            score += 1
+        }
+        direction = directionToNext
+    }
+
+    return score
+}
 
 data class Maze(
     val bounds: Bounds,
@@ -13,8 +31,30 @@ data class Maze(
     private val end: Position,
 ) {
     val nodes by lazy { walkable + start + end }
+    val distances by lazy { computeDistancesFromStart() }
 
     fun getLowestScore(): Int {
+        return distances[end]!!
+    }
+
+    fun getShortestPaths(visited: Path = listOf(end)): Set<Path> {
+        TODO()
+    }
+
+    // Gets "a" shortest path
+    fun getShortestPath(visited: Path = listOf(end)): Path {
+        if (visited.last() == start) return visited
+
+        val neighbourClosestToStart = visited.last().neighbours
+            .filter { nodes.contains(it) }
+            .filter { !visited.contains(it) }
+            .minBy { distances[it]!! }
+
+        return getShortestPath(visited + neighbourClosestToStart)
+    }
+
+    // Dijkstra: https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm#Algorithm
+    fun computeDistancesFromStart(): Map<Position, Int> {
         val distances = mutableMapOf<Position, Int>()
         nodes.forEach { distances[it] = Int.MAX_VALUE }
         distances[start] = 0
@@ -27,7 +67,7 @@ data class Maze(
             val visitedNeighbour = currentNode.neighbours
                 .filter { nodes.contains(it) }
                 .find { !unvisited.contains(it) }
-            val currentDirection = if(visitedNeighbour != null) currentNode - visitedNeighbour else Offset(1, 0)
+            val currentDirection = if (visitedNeighbour != null) currentNode - visitedNeighbour else Offset(1, 0)
 
             currentNode.neighbours
                 .filter { unvisited.contains(it) }
@@ -43,7 +83,7 @@ data class Maze(
             unvisited.remove(currentNode)
         }
 
-        return distances[end]!!
+        return distances
     }
 }
 

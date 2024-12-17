@@ -105,6 +105,12 @@ data class Grid<T> private constructor(val rows: List<MutableList<T>>) {
         return print { null }
     }
 
+    fun toCsv(): String {
+        return rows
+            .map { row -> row.joinToString(", ") }
+            .joinToString("\n")
+    }
+
     fun print(highlighter: (Position) -> T?): String {
         val stringBuilder = StringBuilder()
         for (y in 0 until height) {
