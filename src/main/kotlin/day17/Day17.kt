@@ -79,7 +79,7 @@ enum class InstructionType(val opcode: Int, val execute: (Operand, Computer, Boo
         val aValue = computer.registers.a
         if (print) println("JNZ: if ($aValue (A)) { jumpTo($operandValue (literal)) }")
 
-        if(aValue != 0L) {
+        if (aValue != 0L) {
             computer.copy(instructionPointer = operandValue.toInt())
         } else {
             computer
@@ -147,7 +147,7 @@ data class Computer(
             val operand = program[computer.instructionPointer + 1] as Operand
 
             computer = instruction.execute(operand, computer, print)
-            if(print) {
+            if (print) {
                 println(computer.registers)
             }
         }
@@ -164,7 +164,7 @@ data class Computer(
     fun rawOutput(): List<Int> = output.map { it.toInt() }
 
     fun getRawProgram(): List<Int> = program.map { element ->
-        when(element) {
+        when (element) {
             is Operand -> element.getLiteralValue().toInt()
             is Instruction -> element.type.opcode
         }
