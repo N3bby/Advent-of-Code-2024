@@ -146,7 +146,7 @@ data class Computer(
             val instruction = program[computer.instructionPointer] as Instruction
             val operand = program[computer.instructionPointer + 1] as Operand
 
-            computer = instruction.execute(operand, computer, true)
+            computer = instruction.execute(operand, computer, print)
             if(print) {
                 println(computer.registers)
             }
