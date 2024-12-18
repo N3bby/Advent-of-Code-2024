@@ -21,4 +21,31 @@ class CollectionsKtTest {
 
     }
 
+    @Test
+    fun firstUsingBinarySearch() {
+        val list = listOf(
+            Position(1, 0),
+            Position(2, 1),
+            Position(3, 1),
+            Position(4, 1)
+        )
+        assertThat(list.firstUsingBinarySearchIndexed { (_, value) -> value.y == 1 }).isEqualTo(Position(2, 1))
+
+        // Test first element
+        val list2 = listOf(
+            Position(2, 1),
+            Position(3, 1),
+            Position(4, 1)
+        )
+        assertThat(list2.firstUsingBinarySearchIndexed { (_, value) -> value.y == 1 }).isEqualTo(Position(2, 1))
+
+        // Test last element
+        val list3 = listOf(
+            Position(2, 0),
+            Position(3, 0),
+            Position(4, 1)
+        )
+        assertThat(list3.firstUsingBinarySearchIndexed { (_, value) -> value.y == 1 }).isEqualTo(Position(4, 1))
+    }
+
 }

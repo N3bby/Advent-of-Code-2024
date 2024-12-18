@@ -4,8 +4,6 @@ import ext.accumulationMap
 import util.*
 import kotlin.math.min
 
-typealias Path = List<Position>
-
 fun Path.getScore(): Int {
     var direction = Direction.RIGHT.offset
     var score = 0

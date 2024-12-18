@@ -10,6 +10,17 @@ import kotlin.math.ceil
 
 data class Bounds(val width: Int, val height: Int) {
 
+    val positions = sequence<Position> {
+        for (x in 0 until width) {
+            for (y in 0 until height) {
+                yield(Position(x, y))
+            }
+        }
+    }
+
+    val topLeft = Position(0, 0)
+    val bottomRight = Position(width - 1, height - 1)
+
     val quadrants: List<Region>
         get() = listOf(
             Region(0, width / 2, 0, height / 2),
