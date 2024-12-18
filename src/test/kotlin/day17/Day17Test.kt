@@ -67,7 +67,7 @@ class Day17KtTest {
     fun `part 1 - puzzle input`() {
         val input = readInput(17)
 
-        val computer = parseComputer(input).runUntilHalt(print = true)
+        val computer = parseComputer(input).runUntilHalt(print = false)
 
         assertThat(computer.printOutput()).isEqualTo("1,6,7,4,3,0,5,0,6")
 
