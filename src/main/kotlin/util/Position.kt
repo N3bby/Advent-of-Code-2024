@@ -27,18 +27,6 @@ data class Position(val x: Int, val y: Int) : Comparable<Position> {
             this + Offset(0, -1),
         )
 
-    val diamondAround: List<Position>
-        get() = listOf(
-            this + Offset(2, 0),
-            this + Offset(-2, 0),
-            this + Offset(0, 2),
-            this + Offset(0, -2),
-            this + Offset(1, 1),
-            this + Offset(1, -1),
-            this + Offset(-1, -1),
-            this + Offset(-1, 1),
-        )
-
     val sectors: List<List<Position>>
         get() = listOf(
             listOf(this, this + Offset(1, 0), this + Offset(1, 1), this + Offset(0, 1)),
@@ -46,6 +34,13 @@ data class Position(val x: Int, val y: Int) : Comparable<Position> {
             listOf(this, this + Offset(-1, 0), this + Offset(-1, -1), this + Offset(0, -1)),
             listOf(this, this + Offset(0, -1), this + Offset(1, -1), this + Offset(1, 0)),
         )
+
+    fun getCellsWithinRadius(radius: Int): Set<Position> {
+        return Bounds(radius * 2 + 1, radius * 2 + 1).positions
+            .map { this + Offset(it.x - radius, it.y - radius) }
+            .filter { manhattanDistanceFrom(it) in (1..radius) }
+            .toSet()
+    }
 
     fun manhattanDistanceFrom(other: Position): Int {
         return abs(other.x - x) + abs(other.y - y)

@@ -3,6 +3,7 @@ package day20
 import util.Grid
 import util.Position
 import util.computeDistancesFromStart
+import java.util.stream.Collectors.toSet
 
 typealias SecondsSaved = Int
 
@@ -14,16 +15,18 @@ data class Racetrack(
     val tracks = _tracks + start + end
     private val distances = computeDistancesFromStart(start, tracks)
 
-    fun findCheats(): Set<Cheat> {
+    fun findCheats(cheatDistance: Int): Set<Cheat> {
         return tracks
+            .parallelStream()
             .flatMap { track ->
-                track.diamondAround
+                track.getCellsWithinRadius(cheatDistance)
                     .map { skipToTrack ->
                         Cheat(track, skipToTrack, findSecondsSaved(distances, track, skipToTrack))
                     }
                     .filter { it.secondsSaved > 0 }
+                    .stream()
             }
-            .toSet()
+            .collect(toSet())
     }
 
     private fun findSecondsSaved(
@@ -33,7 +36,7 @@ data class Racetrack(
     ): SecondsSaved {
         if (!distances.containsKey(skipToPosition)) return 0
         val difference = distances.getValue(skipToPosition) - distances.getValue(position)
-        return difference - 2 // Subtract the extra steps for going through the wall
+        return difference - position.manhattanDistanceFrom(skipToPosition) // Subtract the extra steps for going through the wall
     }
 }
 
