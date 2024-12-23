@@ -6,19 +6,20 @@ value class Towel(val towel: String)
 @JvmInline
 value class TowelDesign(private val design: String) {
 
-    fun canBeMadeWith(towels: List<Towel>, cache: MutableMap<String, Boolean> = mutableMapOf()): Boolean {
+    fun getPossibleCombinations(towels: List<Towel>, cache: MutableMap<String, Long> = mutableMapOf()): Long {
         if (cache.contains(design)) return cache[design]!!
 
-        if (design.isBlank()) return true
+        if (design.isBlank()) return 1L
 
         val possibleTowels = towels.filter { design.startsWith(it.towel) }
-        if (possibleTowels.isEmpty()) return false
+        if (possibleTowels.isEmpty()) return 0L
 
-        val canBeMade = possibleTowels.any {
-            TowelDesign(design.removePrefix(it.towel)).canBeMadeWith(towels, cache)
+        val possibleCombinations = possibleTowels.sumOf {
+            TowelDesign(design.removePrefix(it.towel)).getPossibleCombinations(towels, cache)
         }
-        cache[design] = canBeMade
-        return canBeMade
+
+        cache[design] = possibleCombinations
+        return possibleCombinations
     }
 
 }
