@@ -94,6 +94,10 @@ data class Grid<T> private constructor(val rows: List<MutableList<T>>) {
         return matchingCells
     }
 
+    fun getPositionsWhereValue(predicate: (value: T) -> Boolean): List<Position> {
+        return getPositionsWhere { position -> predicate(getAtPosition(position)) }
+    }
+
     fun insertRow(index: Int, row: List<T>): Grid<T> {
         if (row.size != width) throw IllegalArgumentException("Inserted row (width ${row.size}) must be the same width as the grid (width $width)")
         return Grid.from(rows.take(index) + listOf(row) + rows.drop(index))

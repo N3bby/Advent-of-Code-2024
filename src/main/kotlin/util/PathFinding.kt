@@ -26,7 +26,7 @@ fun findShortestPath(start: Position, end: Position, bounds: Bounds, blockedTile
     return getShortestPath()
 }
 
-private fun computeDistancesFromStart(start: Position, nodes: Set<Position>): Map<Position, Int> {
+fun computeDistancesFromStart(start: Position, nodes: Set<Position>): Map<Position, Int> {
     val distances = mutableMapOf<Position, Int>()
     nodes.forEach { distances[it] = Int.MAX_VALUE }
     distances[start] = 0

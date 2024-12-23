@@ -20,14 +20,24 @@ data class Position(val x: Int, val y: Int) : Comparable<Position> {
     }
 
     val neighbours: List<Position>
-        get() {
-            return listOf(
-                this + Offset(1, 0),
-                this + Offset(-1, 0),
-                this + Offset(0, 1),
-                this + Offset(0, -1),
-            )
-        }
+        get() = listOf(
+            this + Offset(1, 0),
+            this + Offset(-1, 0),
+            this + Offset(0, 1),
+            this + Offset(0, -1),
+        )
+
+    val diamondAround: List<Position>
+        get() = listOf(
+            this + Offset(2, 0),
+            this + Offset(-2, 0),
+            this + Offset(0, 2),
+            this + Offset(0, -2),
+            this + Offset(1, 1),
+            this + Offset(1, -1),
+            this + Offset(-1, -1),
+            this + Offset(-1, 1),
+        )
 
     val sectors: List<List<Position>>
         get() = listOf(
